@@ -1,23 +1,30 @@
 const express = require('express');
+const UserModel = require('../src/models/user.model');
 
 const app = express();
 
-app.get("/home", (req, res) => {
-    res.status(200).send('<h1>Hello World</h1>');
-})
+app.use(express.json());
 
-app.get("/users", (req, res) => {
-    const users = [
-            {
-                name: "Joe Doe",
-                email: "joe@gmail.com"
-            }, 
-            {
-                name: "Maria Doe",
-                email: "maria@gmail.com"  
-            }
-        ]
-    res.status(200).json(users)
+app.get("/users", async (req, res) => {
+    try{
+        //pega todos os usuários
+        const users = await UserModel.find({});
+
+        res.status(200).json(users);
+
+    }catch(error){
+        res.status(500).send(error);
+    }
+});
+
+app.post('/users', async (req, res) => {
+    try{
+        //Se não sinalizar ao express que utilizo o json nas requisições ele vai dar uma exceção
+        const user = await UserModel.create(req.body);
+        res.status(201).json(user);
+    }catch (error){
+        res.status(500).send(error.message);
+    }  
 })
 
 const port = 3000;
